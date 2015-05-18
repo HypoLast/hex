@@ -9,6 +9,7 @@
     <script type="text/javascript" src="/HexCell.js"></script>
     <script type="text/javascript" src="/GameInput.js"></script>
     <script type="text/javascript" src="/GameOutput.js"></script>
+    <script type="text/javascript" src="/Tutorial.js"></script>
 </head>
 <body>
     <div id="chooseUsername" style="display: block;">
@@ -31,7 +32,7 @@
 
                 </div>
                 <div id="menu-buttons"> 
-
+                    <button onclick="Game.showScreen('tutorial', true);">How to play</button>
                 </div>
             </div>
         </div>
@@ -39,6 +40,25 @@
     <div id="gameScreen" style="display: none;">
         <div id="game-container">
             <canvas id="canvas" width=800 height=600></canvas>
+        </div>
+    </div>
+    <div id="tutorial" style="display: none;">
+        <div id="tutorial-slides">
+            <img src="/tutorial/tutorial1.png" id="tutorial1" class="tutorial-img">
+            <img src="/tutorial/tutorial2.png" id="tutorial2" class="tutorial-img">
+            <img src="/tutorial/tutorial3.png" id="tutorial3" class="tutorial-img">
+            <img src="/tutorial/tutorial4.png" id="tutorial4" class="tutorial-img">
+            <img src="/tutorial/tutorial5.png" id="tutorial5" class="tutorial-img">
+            <img src="/tutorial/tutorial6.png" id="tutorial6" class="tutorial-img">
+            <img src="/tutorial/tutorial7.png" id="tutorial7" class="tutorial-img">
+            <img src="/tutorial/tutorial8.png" id="tutorial8" class="tutorial-img">
+            <img src="/tutorial/tutorial9.png" id="tutorial9" class="tutorial-img">
+        </div>
+        <br/>
+        <div id="tutorial-navbar">
+            <button id="tutorial-previous" class="tutorial-button">Previous</button>
+            <button id="tutorial-back-to-lobby" class="tutorial-button">Back to Lobby</button>
+            <button id="tutorial-next" class="tutorial-button">Next</button>
         </div>
     </div>
 

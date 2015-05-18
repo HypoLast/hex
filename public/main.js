@@ -159,10 +159,12 @@
         }
 
         Game.SocketIO.init();
+        Game.Tutorial.init();
         Game.screens = {
             chooseUsername: document.getElementById('chooseUsername'),
             lobby: document.getElementById('lobby'),
-            gameScreen: document.getElementById('gameScreen')
+            gameScreen: document.getElementById('gameScreen'),
+            tutorial: document.getElementById('tutorial')
         };
         Game.playerList = document.getElementById('player-list');
         Game.overlayBg = document.getElementById('overlay-bg');

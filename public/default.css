@@ -48,6 +48,8 @@ input {
     display: inline-block;
     width: 25vw;
     height: 100%;
+    margin-top: 0;
+    vertical-align: top;
 }
 
 #players-container {
@@ -88,6 +90,34 @@ input {
     max-height: calc(38vw + 50vh);
     position: fixed;
     bottom: 0;
+}
+
+#tutorial-slides {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+#tutorial-navbar {
+    display: inline-block;
+}
+
+#tutorial {
+    width: 100%;
+    position: relative;
+    text-align: center;
+}
+
+.tutorial-img {
+    display: none;
+    width: 81vh;
+    height: 90vh;
+}
+
+.tutorial-button {
+    margin-right: auto;
+    margin-left: auto;
+    width: 250px;
+    font-size: 25px;
 }
 
 .player-bar:nth-child(odd) {
