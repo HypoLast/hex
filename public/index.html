@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+    <title>Hex</title>
+    <link rel="stylesheet" href="default.css">
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/wolfy87/EventEmitter.min.js"></script>
+    <script type="text/javascript" src="/main.js"></script>
+    <script type="text/javascript" src="/SocketIO.js"></script>
+    <script type="text/javascript" src="/HexCell.js"></script>
+    <script type="text/javascript" src="/GameInput.js"></script>
+    <script type="text/javascript" src="/GameOutput.js"></script>
+</head>
+<body>
+    <div id="chooseUsername" style="display: block;">
+        <form name="username">
+            <span>Choose your username:</span><br/>
+            <input type="text" name="username"><br/>
+            <input type="submit" value="Join Lobby">
+        </form>
+    </div>
+    <div id="lobby" style="display: none;">
+        <div id="whole-lobby">
+            <div id="lobby-left">
+                <div id="players-container">
+                    <div id="player-list">
+                    </div>
+                </div>
+            </div>
+            <div id="lobby-right">
+                <div id="chat-window">
+
+                </div>
+                <div id="menu-buttons"> 
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="gameScreen" style="display: none;">
+        <div id="game-container">
+            <canvas id="canvas" width=800 height=600></canvas>
+        </div>
+    </div>
+
+
+
+    <!-- OVERLAY POPUPS -->
+    <div id="overlay-bg" class="overlay-bg">
+        <div id="standard-popup" class="popup-content">
+            <span id="standard-text" class="popup-text">Standard dialog</span>
+            <button id="ok-popup-button" class="popup-button">OK</button>
+        </div>
+        <div id="yesno-popup" class="popup-content">
+            <span id="yesno-text" class="popup-text">Yes/No dialog</span>
+            <button id="no-popup-button" class="popup-button">Decline</button>
+            <button id="yes-popup-button" class="popup-button">Accept</button>
+        </div>
+    </div>
+</body>
