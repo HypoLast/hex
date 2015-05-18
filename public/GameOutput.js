@@ -10,11 +10,27 @@
         for (var pName in players) {
             if (pName !== Game.SocketIO.username) return pName;
         }
-    }
+    };
+
+    function formatTime(time) {
+        var minutes = Math.floor(time / 60);
+        var seconds = Math.floor(time) % 60;
+
+        if (time >= 60) {
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+            return minutes + ":" + seconds;
+        } else {   
+            var tenths = Math.floor(time * 10) % 10;
+            return seconds + "." + tenths;
+        }
+    };
 
     Game.GameOutput = {
+        gameGoing: false,
         currentBoard: undefined,
-
+        timers: {blue: 600, red: 600},
         drawBoard: function(board) {
             if (board) {
                 this.currentBoard = board;
@@ -22,6 +38,7 @@
                 board = this.currentBoard;
                 if (!board) return;
             }
+            this.timers = board.timers;
             var grid = board.grid;
             var ctx = Game.ctx;
             ctx.save();
@@ -71,6 +88,13 @@
             ctx.fillText(Game.SocketIO.username, 60, 550);
             ctx.fillText(otherPlayersName(board.players), 60, 70);
             
+            // timers
+            ctx.textAlign = "right";
+            var myTime = this.timers[board.players[Game.SocketIO.username]];
+            var theirTime = this.timers[board.players[otherPlayersName(board.players)]];
+            ctx.fillText(formatTime(theirTime), 730, 60);
+            ctx.fillText(formatTime(myTime), 730, 560);
+            
             // color indicators
             ctx.fillStyle = board.players[otherPlayersName(board.players)];
             ctx.beginPath();
@@ -107,6 +131,7 @@
 
             function gameWon() {
                 that.unlinkListeners();
+                Game.GameInput.unlinkMouse();
                 Game.showPopup("standard", "You won the game.", function() {
                     Game.showScreen("lobby", true);
                     Game.hidePopup();
@@ -115,6 +140,7 @@
 
             function gameLost() {
                 that.unlinkListeners();
+                Game.GameInput.unlinkMouse();
                 Game.showPopup("standard", "You lost the game.", function() {
                     Game.showScreen("lobby", true);
                     Game.hidePopup();
@@ -123,6 +149,7 @@
 
             function gameDraw() {
                 that.unlinkListeners();
+                Game.GameInput.unlinkMouse();
                 Game.showPopup("standard", "The game was a draw.", function() {
                     Game.showScreen("lobby", true);
                     Game.hidePopup();
@@ -133,12 +160,33 @@
             Game.SocketIO.emitter.on("gameWon", gameWon);
             Game.SocketIO.emitter.on("gameLost", gameLost);
             Game.SocketIO.emitter.on("gameDraw", gameDraw);
+            this.gameGoing = true;
+            requestAnimationFrame(this.tickGame);
         },
         unlinkListeners: function() {
             Game.SocketIO.emitter.removeAllListeners("board");
             Game.SocketIO.emitter.removeAllListeners("gameWon");
             Game.SocketIO.emitter.removeAllListeners("gameLost");
             Game.SocketIO.emitter.removeAllListeners("gameDraw");
+            this.gameGoing = false;
+        },
+        lastTickTime: 0,
+        tickGame: function() {
+            var that = Game.GameOutput;
+            var tickTime = Date.now();
+            var dt = (tickTime - that.lastTickTime) / 1000;
+            that.lastTickTime = tickTime;
+            if (that.currentBoard && that.currentBoard.moves > 1) {
+                var color = that.currentBoard.players[that.currentBoard.playersTurn];
+                that.timers[color] -= dt;
+                if (that.timers[color] < 0) {
+                    that.timers[color] = 0;
+                }
+                that.drawBoard();
+            }
+            if (that.gameGoing) {
+                requestAnimationFrame(that.tickGame);
+            }
         }
     }
 })();

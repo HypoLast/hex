@@ -41,8 +41,10 @@
             var myColor = board.players[Game.SocketIO.username];
             this.calculatedMoves = {};
             this.startMoves = [];
+            var reserve = 2;
             for (var cell in board.grid) {
                 if (board.grid[cell] && board.grid[cell].color == myColor) {
+                    if (board.grid[cell].size === 1) reserve --;
                     var hex = Game.HexCell.fromString(cell);
                     this.startMoves.push(hex);
                     this.calculatedMoves[cell] = [];
@@ -54,9 +56,9 @@
                     }
                 }
             }
-            if (!board.grid["0,-3,3"] && myColor === "blue") {
+            if (!board.grid["0,-3,3"] && myColor === "blue" && reserve > 0) {
                 this.startMoves.push(new Game.HexCell(0, -3, 3));
-            } else if (!board.grid["0,3,-3"] && myColor === "red") {
+            } else if (!board.grid["0,3,-3"] && myColor === "red" && reserve > 0) {
                 this.startMoves.push(new Game.HexCell(0, 3, -3));
             }
         },
@@ -116,7 +118,7 @@
         },
 
         unlinkMouse: function() {
-
+            Game.canvas.onmousedown = undefined;
         }
     }
     

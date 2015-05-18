@@ -7,9 +7,11 @@ var colors = ["blue", "red"];
 function applyMove(player, move) {
     if (this.turn !== this.players[player]) return;
     if (typeof(move) === "string") {
-        if (this.bases[player] === move && !this.board[move]) {
+        if (this.bases[player] === move && !this.board[move] && this.reserves[player] > 0) {
             this.board[move] = {color: colors[player], size: 1};
+            this.reserves[player] --;
             this.turn = this.players[otherPlayer[player]];
+            this.numMoves ++;
         }
     } else if (typeof(move) === "object") {
         var from = this.board[move.from];
@@ -22,12 +24,22 @@ function applyMove(player, move) {
             toHex.distanceTo() > 3 ||
             fromHex.distanceTo(toHex) !== from.size) return;
         if (to && to.color === colors[player]) {
+            if (to.size === 1) {
+                this.reserves[player] ++;
+            }
+            if (from.size === 1) {
+                this.reserves[player] ++;
+            }
             to.size += from.size;
         } else {
+            if (to && to.size === 1) {
+                this.reserves[otherPlayer[player]] ++;
+            }
             this.board[move.to] = from;
         }
         this.board[move.from] = null;
         this.turn = this.players[otherPlayer[player]];
+        this.numMoves ++;
     }
     this.p1.socket.emit("board", this.packState());
     this.p2.socket.emit("board", this.packState());
@@ -35,11 +47,15 @@ function applyMove(player, move) {
 };
 
 var Game = module.exports = function(player1, player2) {
+    this.lastTickTime = 0;
+    this.numMoves = 0;
+    this.timers = [300, 300];
     this.emitter = new EventEmitter();
     this.p1 = player1;
     this.p2 = player2;
     this.players = [this.p1, this.p2];
     this.checks = [false, false];
+    this.reserves = [2, 2];
     player1.game = this;
     player2.game = this;
     player1.socket.on("move", applyMove.bind(this, 0));
@@ -62,13 +78,35 @@ Game.prototype.packState = function() {
     return {
         playersTurn: this.turn.username,
         players: players,
-        grid: this.board
+        grid: this.board,
+        timers: {
+            "blue": this.timers[0],
+            "red": this.timers[1]
+        },
+        moves: this.numMoves
     }
 };
 
 Game.prototype.start = function() {
     this.p1.socket.emit("board", this.packState());
     this.p2.socket.emit("board", this.packState());
+    this.lastTickTime = Date.now();
+    var that = this;
+    this.timer = setInterval(function() {
+        var tickTime = Date.now();
+        var dt = (tickTime - that.lastTickTime) / 1000;
+        that.lastTickTime = tickTime;
+        if (that.numMoves > 1) {
+            var tIdx = that.players.indexOf(that.turn);
+            that.timers[tIdx] -= dt;
+            if (that.timers[tIdx] <= 0) {
+                that.timers[tIdx] = 0;
+                that.p1.socket.emit("board", that.packState());
+                that.p2.socket.emit("board", that.packState());
+                that.end(that.turn);
+            }
+        }
+    }, 100);
 };
 
 Game.prototype.name = function() {
@@ -76,6 +114,7 @@ Game.prototype.name = function() {
 };
 
 Game.prototype.end = function(losingPlayer) {
+    clearInterval(this.timer);
     this.p1.location = "lobby";
     this.p2.location = "lobby";
     this.p1.socket.removeAllListeners("move");
