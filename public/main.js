@@ -23,6 +23,7 @@
         if (accepted) {
             Game.SocketIO.acceptChallenge();
         } else {
+            Game.showScreen("lobby", true);
             Game.SocketIO.declineChallenge();
         }
     };
