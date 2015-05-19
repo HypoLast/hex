@@ -15,6 +15,12 @@
                 that.username = name;
                 that.socket.removeAllListeners();
                 that.emitter.emit("joinLobby");
+                that.socket.on("disconnect", function() {
+                    Game.hidePopup();
+                    Game.showPopup("standard", "You were disconnected from the server.", function() {
+                        window.location.reload();
+                    });
+                });
                 that.socket.on("playerJoinedLobby", that.playerJoinedLobby);
                 that.socket.on("playerLeftLobby", that.playerLeftLobby);
                 that.socket.on("playerUnavailable", that.playerUnavailable);
