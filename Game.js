@@ -139,9 +139,10 @@ Game.prototype.end = function(losingPlayer) {
 
 Game.prototype.updateWinConditions = function(pNum) {
     var myBase = this.bases[pNum];
+    var theirBase = this.bases[otherPlayer[pNum]];
     if (this.board[myBase] && this.board[myBase].color !== colors[pNum]) {
         if (this.checks[pNum]) {
-            if (this.checks[otherPlayer[pNum]]) {
+            if (this.board[theirBase] && this.board[theirBase].color !== colors[otherPlayer[pNum]]) {
                 return this.end();
             } else {
                 return this.end(this.players[pNum]);
