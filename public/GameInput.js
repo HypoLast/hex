@@ -43,7 +43,7 @@
             this.startMoves = [];
             var reserve = 2;
             for (var cell in board.grid) {
-                if (board.grid[cell] && board.grid[cell].color == myColor) {
+                if (board.grid[cell] && board.grid[cell].color === myColor) {
                     if (board.grid[cell].size === 1) reserve --;
                     var hex = Game.HexCell.fromString(cell);
                     this.startMoves.push(hex);

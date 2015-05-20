@@ -5,6 +5,7 @@ var path = require("path");
 
 var Player = require("./Player");
 var Game = require("./Game");
+var AIAdapter = require("./AI/AIAdapter");
 
 var app = express();
 app.use(express.static(path.join(__dirname, "public")));
@@ -113,11 +114,29 @@ io.on("connect", function(socket) {
         });
     };
 
+    function playAgainstAI() {
+        if (!myself || myself.location !== "lobby") return;
+        myself.location = "inGame";
+        myself.socket.emit("startGame");
+        var game;
+        if (Math.random() < 0.5) {
+            game = new Game(myself, new AIAdapter("AI-Easy"));
+        } else {
+            game = new Game(new AIAdapter("AI-Easy"), myself);
+        }
+        games[game.name()] = game;
+        game.start();
+        game.emitter.on("ended", function() {
+            delete games[game.name()];
+        });
+    };
+
     socket.on("username", username);
     socket.on("challenge", challenge);
     socket.on("cancelChallenge", cancelChallenge);
     socket.on("acceptChallenge", acceptChallenge);
     socket.on("declineChallenge", declineChallenge);
+    socket.on("playAgainstAI", playAgainstAI);
 
     socket.on("disconnect", function() {
         if (myself) {

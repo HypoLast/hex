@@ -60,6 +60,12 @@ var Game = module.exports = function(player1, player2) {
     player2.game = this;
     player1.socket.on("move", applyMove.bind(this, 0));
     player2.socket.on("move", applyMove.bind(this, 1));
+    player1.socket.on("concede", (function(player) {
+        this.end(player);
+    }).bind(this, player1));
+    player2.socket.on("concede", (function(player) {
+        this.end(player);
+    }).bind(this, player2));
     this.turn = this.p1;
     var board = this.board = board = {};
     var seed = new hc();
@@ -83,7 +89,8 @@ Game.prototype.packState = function() {
             "blue": this.timers[0],
             "red": this.timers[1]
         },
-        moves: this.numMoves
+        moves: this.numMoves,
+        checks: this.checks
     }
 };
 
@@ -119,6 +126,8 @@ Game.prototype.end = function(losingPlayer) {
     this.p2.location = "lobby";
     this.p1.socket.removeAllListeners("move");
     this.p2.socket.removeAllListeners("move");
+    this.p1.socket.removeAllListeners("concede");
+    this.p2.socket.removeAllListeners("concede");
     if (losingPlayer) {
         if (losingPlayer === this.p1) {
             this.p1.socket.emit("gameLost");

@@ -54,3 +54,7 @@ HexCoord.prototype.distanceTo = function() {
     }
     return 0;
 };
+
+HexCoord.prototype.copy = function() {
+    return new HexCoord(this.x, this.y, this.z);
+};

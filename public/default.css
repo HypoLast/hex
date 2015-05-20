@@ -59,9 +59,10 @@ input {
 }
 
 #chat-window {
-    /*background-color: orange;*/
+    background-color: orange;
     height: 60vh;
     margin-top: 10vh;
+    position: relative;
 }
 
 #menu-buttons {
