@@ -40,6 +40,10 @@ function copyGrid(grid) {
     return newGrid;
 };
 
+HexProblem.prototype.myTimeLeft = function() {
+    return this.state.timers[colors[this.playerNum]];
+};
+
 HexProblem.prototype.dispose = function() {
     this.state = undefined;
     this.h = undefined;
@@ -85,25 +89,19 @@ HexProblem.prototype.colorHeuristics = function() {
     for (var cell in state.grid) {
         if (state.grid[cell]) {
             if (state.grid[cell].color === "blue") {
-                var weight = state.grid[cell].size;
+                var weight = Math.min(4, Math.pow(state.grid[cell].size, 1.1));
                 var hex = HexCoord.fromString(cell);
-                weight *= (hex.y - hex.z + 6) / 12 * 0.4 + 1; // farther up the board is better
+                weight *= (hex.y - hex.z + 6) / 12 * 0.1 + 1; // farther up the board is better
                 if (hex.distanceTo(redBase) === state.grid[cell].size) {
                     weight *= 1.5; // in jumping distance of the base, this is worth a lot
                 }
-                if (state.grid[cell].size === 1) {
-                    weight -= 0.2; // make 2 1's slightly worse than a 2
-                }
                 bluePieces += weight;
             } else {
-                var weight = state.grid[cell].size;
+                var weight = Math.min(4, Math.pow(state.grid[cell].size, 1.1));
                 var hex = HexCoord.fromString(cell);
-                weight *= (hex.z - hex.y + 6) / 12 * 0.4 + 1;
+                weight *= (hex.z - hex.y + 6) / 12 * 0.1 + 1;
                 if (hex.distanceTo(blueBase) === state.grid[cell].size) {
                     weight *= 1.5;
-                }
-                if (state.grid[cell].size === 1) {
-                    weight -= 0.2;
                 }
                 redPieces += weight;
             }
@@ -134,9 +132,16 @@ HexProblem.prototype.heuristic = function() {
         return this.h = 0;
     }
     var colorH = this.colorHeuristics();
+    var checkPenalty = 0;
     if (myColor === "blue") {
-        return this.h = colorH.blue - colorH.red;
+        if (state.grid[bases[0]] && state.grid[bases[0]].color === "red") {
+            checkPenalty = 10;
+        }
+        return this.h = colorH.blue - colorH.red - checkPenalty;
     } else {
+        if (state.grid[bases[1]] && state.grid[bases[1]].color === "blue") {
+            checkPenalty = 10;
+        }
         return this.h = colorH.red - colorH.blue;
     }
 };

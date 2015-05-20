@@ -16,7 +16,8 @@ function makeMoveOnBoard(board) {
     var problem = new HexProblem(board, username);
     if (problem.canMove()) {
         var tpp = new TwoPlayerProblem(problem);
-        var move = tpp.nextMove(Math.min(5, Math.max(2, Math.floor(problem.volatility() * .75))), true);
+        var timeRemaining = problem.myTimeLeft();
+        var move = tpp.nextMove(Math.min(5, Math.max(2, Math.floor(problem.volatility() * .7 * timeRemaining / 300))), true);
         if (move) {
             process.send(move.packet());
         } else {
